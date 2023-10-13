@@ -36,15 +36,12 @@ if __name__ == "__main__":
    for f in os.listdir():
       name, ext = os.path.splitext(f)
       if "doc" in ext:
-         # Convert file to md and extract images
          # Slugify filename
          slug = slugify(name)
          target = os.path.join(path, f"{slug}.md")
-         #temp_img_dir = os.path.join(path, "temp")
+         # Convert file to md and extract images
          subprocess.run(["pandoc", "-t", "gfm", "--extract-media", path, "--wrap=none", f, "-o", target])
 
-         # Check for img tags and convert to markdown syntax
-         # Change image addresses in file
          def img_to_md(str):
             img_num = img_num_pattern.search(str.group()).group()
             #img_num = re.search("(\d+)\.\w{3,4}(?=\")", str)
@@ -55,7 +52,9 @@ if __name__ == "__main__":
             md_text = md_file.read()
 
          with open(target, "w", encoding='utf-8') as md_file:
-            #md_text = md_file.read()
+            # remove escape characters for backticks
+            md_text = md_text.replace("\`", "`")
+            # convert img to markdown syntax and update src
             md_text = re.sub("<img src.+\/>", img_to_md, md_text)
             md_file.write(md_text)
 
