@@ -1,4 +1,5 @@
 import os
+import random
 import subprocess
 import shutil
 import re
@@ -16,6 +17,8 @@ if __name__ == "__main__":
    # Create a new dir, and an image dir inside it
    media_dir = os.path.join(path, "media")
 
+   rand = ''.join(random.choice("abcdefghijklmnopqrstuvwxyz23456890") for i in range(5))
+
    ## TODO: ask to delete folder
    ##if os.path.exists(path):
    ##   confirm_delete = input("This folder already exists. Delete the folder (y/n):")
@@ -29,12 +32,11 @@ if __name__ == "__main__":
 
    img_num_pattern = re.compile("(\d+)\.\w{3,4}(?=\")")
 
-   ## TODO: Show progress bar
-
-   ## TODO: Exit if no files
+   file_list = [f for f in os.listdir('.') if f.endswith('.docx')]
    # For each file:
-   for f in os.listdir():
+   for f in file_list:
       name, ext = os.path.splitext(f)
+      print(f"Converting {name}...")
       if "doc" in ext:
          # Slugify filename
          slug = slugify(name)
@@ -45,7 +47,7 @@ if __name__ == "__main__":
          def img_to_md(str):
             img_num = img_num_pattern.search(str.group()).group()
             #img_num = re.search("(\d+)\.\w{3,4}(?=\")", str)
-            return f"![image](/.attachments/{slug}{img_num})"
+            return f"![image](/.attachments/{slug}{rand}{img_num})"
 
          md_text = ""
          with open(target, "r", encoding='utf-8') as md_file:
@@ -60,7 +62,11 @@ if __name__ == "__main__":
 
          # Rename images using slugified filename
          for img in os.listdir(media_dir):
-            renamed = f"{slug}{img.replace('image','')}"
+            renamed = f"{slug}{rand}{img.replace('image','')}"
             shutil.move(os.path.join(media_dir, img), os.path.join(path, "images", renamed))
 
+      #print(f"...Completed {name}")
+
    os.removedirs(media_dir)
+
+print("===Converted all files===")
