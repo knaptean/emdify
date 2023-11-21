@@ -19,6 +19,8 @@ if __name__ == "__main__":
 
    rand = ''.join(random.choice("abcdefghijklmnopqrstuvwxyz23456890") for i in range(5))
 
+   ## TODO: Add metadata
+
    ## TODO: ask to delete folder
    ##if os.path.exists(path):
    ##   confirm_delete = input("This folder already exists. Delete the folder (y/n):")
@@ -28,7 +30,7 @@ if __name__ == "__main__":
    ##      exit("Cannot overwrite 'md' folder")
 
    if not os.path.exists(path):
-      os.makedirs(os.path.join(path, "images"))
+      os.makedirs(os.path.join(path, ".attachments"))
 
    img_num_pattern = re.compile("(\d+)\.\w{3,4}(?=\")")
 
@@ -63,10 +65,13 @@ if __name__ == "__main__":
          # Rename images using slugified filename
          for img in os.listdir(media_dir):
             renamed = f"{slug}{rand}{img.replace('image','')}"
-            shutil.move(os.path.join(media_dir, img), os.path.join(path, "images", renamed))
+            shutil.move(os.path.join(media_dir, img), os.path.join(path, ".attachments", renamed))
 
       #print(f"...Completed {name}")
+   if os.path.exists(media_dir):
+      os.removedirs(media_dir)
 
-   os.removedirs(media_dir)
-
-print("===Converted all files===")
+   if len(file_list) > 0:
+      print("===Converted all files===")
+   else:
+      print("No files to convert!")
