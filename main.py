@@ -13,8 +13,6 @@ def slugify(s):
 
 if __name__ == "__main__":
    path = os.path.join(os.getcwd(), "md")
-   #main()
-   # Create a new dir, and an image dir inside it
    media_dir = os.path.join(path, "media")
 
    rand = ''.join(random.choice("abcdefghijklmnopqrstuvwxyz23456890") for i in range(5))
@@ -29,8 +27,12 @@ if __name__ == "__main__":
    ##   else:
    ##      exit("Cannot overwrite 'md' folder")
 
+   # Create a new dir, and an image dir inside it
    if not os.path.exists(path):
       os.makedirs(os.path.join(path, ".attachments"))
+   # Create a media dir, if it doesnt exist
+   if not os.path.exists(media_dir):
+      os.makedirs(media_dir)
 
    img_num_pattern = re.compile("(\d+)\.\w{3,4}(?=\")")
 
