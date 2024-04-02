@@ -7,6 +7,7 @@ from datetime import date
 
 product = ""
 author = ""
+reviewer = ""
 techwriter = ""
 
 def slugify(s):
@@ -63,7 +64,7 @@ def convert_files(file_list):
                     "tech-writer:\n" \
                     f"  - {techwriter}\n" \
                     "reviewer: \n" \
-                    f"  - {author}\n" \
+                    f"  - {reviewer}\n" \
                     f"reviewed: {date.today()}\n" \
                     "tags:\n" \
                     f"  - {product}\n" \
@@ -108,6 +109,8 @@ if __name__ == "__main__":
       author = input("Author: ")
       techwriter = input("Tech Writer: ")
       reviewer = input("Reviewer: ")
+      if (reviewer == ""):
+         reviewer = author
       
       convert_files(file_list)
 
