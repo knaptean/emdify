@@ -65,6 +65,7 @@ def convert_files(file_list):
                     f"  - {techwriter}\n" \
                     "reviewer: \n" \
                     f"  - {reviewer}\n" \
+                    f"published: {date.today()}\n" \
                     f"reviewed: {date.today()}\n" \
                     "tags:\n" \
                     f"  - {product}\n" \
