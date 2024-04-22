@@ -10,16 +10,12 @@ author = ""
 reviewer = ""
 techwriter = ""
 
-def slugify(s):
-    s = s.strip()
-    s = re.sub(r'[^\w\s-]', '', s)
-    s = re.sub(r'[\s_-]+', '-', s)
-    s = re.sub(r'^-+|-+$', '', s)
-    return s
-
-#img_num_pattern = re.compile("(\d+)\.[A-z]{3,4}(?=\")")
-#src_filename_pattern = re.compile("[\\\/](\w+\.[A-z]{3,4})(?=\")")
 src_filename_pattern = re.compile("\/(\w+?\.[A-z]{3,4})(?=\")")
+
+header_pattern = re.compile("^\#+\s")
+ol_pattern = re.compile("^\s*\d+\.\s")
+text_pattern = re.compile("^<?\w+")
+ul_pattern = re.compile("^-\s")
 
 # Create three directories
 # One base dir with all converted files
@@ -34,6 +30,13 @@ if not os.path.exists(media_dir):
 attch_dir = os.path.join(base_dir, ".attachments")
 if not os.path.exists(attch_dir):
    os.makedirs(attch_dir)
+
+def slugify(s):
+    s = s.strip()
+    s = re.sub(r'[^\w\s-]', '', s)
+    s = re.sub(r'[\s_-]+', '-', s)
+    s = re.sub(r'^-+|-+$', '', s)
+    return s
 
 def get_img_replacer_callback(slug, rand):
    def inner(str):
@@ -99,8 +102,35 @@ def convert_files(file_list):
 
             md_text = ""
             with open(target, "r", encoding='utf-8') as md_file:
-               md_text = insert_metadata(md_file.read())
+               lines = md_file.readlines()
+               # a stack to store the indentation points
+               landmarks = []
+               indent = "    "
 
+               # iterate over lines to fix spacing issues
+               for i, line in enumerate(lines):
+                  if len(line.strip()) > 0:
+                     if header_pattern.match(line):
+                        landmarks.clear()
+                        md_text += "\n" + line
+
+                     elif ol_pattern.match(line): # numbered list item
+                        num = int(line.split(".")[0]) # get the number
+                        if num == 1: # start of a new list
+                           landmarks.append(num) # set a new indentation level
+                        elif (len(landmarks) > 0) and (num - 1) != landmarks[-1]:
+                           # break in the numbering
+                           landmarks.pop() # go back one indent
+                           landmarks[-1] = num # replace the last landmark
+                        else:
+                           landmarks[-1] = num # replace the last landmark
+                        #md_text += "\n" + ( indent * (len(landmarks) - 1) ) + line # add new line and indent
+                        md_text += "\n" + line # add new line and indent
+
+                     else: # text/ul/image
+                        md_text += "\n" + (indent * len(landmarks)) + line ## add indents
+
+            md_text = insert_metadata(md_text)
             # remove escape characters for backticks
             md_text = md_text.replace('\`', '`')
             md_text = md_text.replace('“|”', '"')
